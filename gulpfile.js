@@ -118,7 +118,7 @@ gulp.task('html', function() {
 
 // Our Build task for everything
 gulp.task('build', ['clean'], function(done) {
-  sequence('copy', ['scripts', 'images' ], 'injection', 'html', 'browser-sync', done);
+  sequence('copy', ['scripts', 'images'], 'injection', 'html', 'browser-sync', done);
 });
 
 gulp.task('browser-sync', function() {
@@ -138,11 +138,11 @@ Replace the css tag for the style.css with the inject:css command below
 <!-- inject:css -->
 <!-- endinject -->
 */
-gulp.task('injection',['styles'], function() {
+gulp.task('injection',['styles'], function(done) {
   var target = gulp.src(['dist/*.html']);
   // It's not necessary to read the files (will speed up things), we're only after their paths:
   // var vendorSrc = gulp.src(['dist/css/vendor/' + framework + '.min.css'], { read: false});
-  var mainSrc = gulp.src(['dist/css/main.css'], {read: false});
+  var mainSrc = gulp.src(['dist/css/main.min.css'], {read: false});
   var jsSrc = gulp.src(['src/scripts/*.js'], {read: false});
 
   return target.pipe(inject(series( mainSrc, jsSrc), {addRootSlash: false,ignorePath: 'dist'}))
@@ -150,26 +150,17 @@ gulp.task('injection',['styles'], function() {
   .pipe(browserSync.reload({
     stream: true
   }))
-
-
-
-  /*
-  return target.pipe(inject(sources, {
-  // Do not add a root slash to the beginning of the path
-  addRootSlash: false,
-  // Remove the `public` from the path when doing the injection
-  ignorePath: 'dist'
-}))
-.pipe(gulp.dest('./dist'));*/
+  done();
 });
-gulp.task('uncss', function() {
+gulp.task('uncss', function(done) {
   return gulp.src([
     'dist/css/**/*.css'
   ])
   .pipe(uncss({
     html: ['dist/*.html']
   }))
-  .pipe(gulp.dest('dist/uncssED/'))
+  .pipe(gulp.dest('dist/css/'))
+    done();
 });
 
 gulp.task('default', ['build'], function() {
